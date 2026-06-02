@@ -63,13 +63,13 @@ uygulamalar için önermekte olup bu proje kapsamında da EasyOCR seçilmiştir.
 
 ### PDF İşleme Stratejisi
 
-PDF'ler heterojen olabiliyor: bazı sayfalar seçilebilir metin içerirken
-bazıları taranmış görüntüden oluşuyor, bazıları ikisini birden barındırıyor.
+PDF'ler heterojen olabilmektedir. Bazı sayfalar seçilebilir metin içerirken
+bazıları taranmış görüntüden oluşmakta, bazıları karışık olabilmektedir.
 
 Tasarlanan strateji:
 
 - Sayfa başına karakter sayısı < 10 ise sayfa büyük olasılıkla
-  taranmış -> tüm sayfa EasyOCR'a gönder
+  taranmış -> tüm sayfayı EasyOCR'a gönder
 - ≥ 10 ise PyMuPDF ile metin bloklarını çıkar, image block'ları
   ayrıca EasyOCR'a gönder ve metne ekle
 
