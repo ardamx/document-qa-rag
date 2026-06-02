@@ -74,7 +74,7 @@ Tasarlanan strateji:
   ayrıca EasyOCR'a gönder ve metne ekle
 
 Bu yaklaşım metin kaybını önlemekte ve gereksiz OCR çağrısını minimize
-etemktedir.
+etmektedir.
 
 ---
 
