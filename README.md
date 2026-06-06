@@ -34,12 +34,12 @@ Ingestion → Extraction → Indexing → Retrieval + Generation → UI
 - GPU kullanımı için **NVIDIA Container Toolkit** (önerilir)
 
 > **Not:** GPU önerilir. NVIDIA Container Toolkit kurulu değilse sistem
-> CPU üzerinde çalışır, ancak LLM yanıt süreleri belirgin biçimde uzar.
+> CPU üzerinde çalışır, ancak LLM yanıt süreleri uzar.
 
 ## Kurulum ve Çalıştırma
 
 ```bash
-docker compose up --build
+docker compose up
 ```
 
 İlk açılışta LLM modeli (~7 GB) otomatik indirilir, bu işlem birkaç
