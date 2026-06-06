@@ -107,3 +107,72 @@ app/
 └── qa.py            ← Ollama + prompt + similarity threshold
 ```
 
+---
+
+## 05 Haziran 2026
+
+### GPU ve Container Kararı
+
+Case study'nin herkes tarafından kolayca çalıştırılabilir isterini karşılayabilmek
+için Ollama ve EasyOCR servislerinin container içerisine alınmasına karar verilmiştir.
+Fakat container içerisinden GPU'ya erişebilmek için sistemin çalıştırılacağı makinada
+NVIDIA Container Toolkit yüklü olması ihtiyacı ortaya çıkmaktadır.
+Her iki servis de toolkit kurulu değilse otomatik olarak CPU'ya düşmektedir.
+CPU'da gemma3:12b performansı yavaşlamaktadır (tahmini 2-5 dk/cevap).
+README'ye "GPU önerilir, yoksa performans düşer" notu eklenmiştir.
+
+### UI Tasarımı
+
+UI için GPT tarzı tek ekran yerine iki bölümlü yapı tercih edilmiştir:
+üstte dosya yükleme, altta chat box. Chat alanı indexing tamamlanana
+kadar disabled kalmaktadır. Böylece iki aşama (önce belge hazırlama,
+sonra sorgulama) net ayrılmakta ve kullanıcının boş veritabanına soru
+sorması engellenmektedir.
+
+Chat geçmişi `session_state`'te tutulup ekranda gösterilmekte, ancak
+prompt'a dahil edilmemektedir. Her soru, retrieve edilen chunk'larla
+bağımsız olarak yanıtlanmaktadır. Önceki soruların prompt'a katılması
+context'i şişirip hallucination riskini artıracağından tercih
+edilmemiştir; case çok turlu konuşma değil, belge üzerinden soru-cevap
+gerektirmektedir.
+
+### Indexing Katmanı (embedding + vector store)
+
+Embedding modeli olarak Türkçe ve İngilizce destekleyen, local çalışan
+`paraphrase-multilingual-mpnet-base-v2` seçilmiştir. Model lazy loading
+ile ilk kullanımda yüklenmektedir.
+
+Chunk boyutu 300 kelime, örtüşme 50 kelime olarak belirlenmiştir. Boyut seçimi
+embedding modelinin 512 token sınırı ve LLamaIndex benchmark raporuna göre belirlenmiştir.
+(https://www.llamaindex.ai/blog/evaluating-the-ideal-chunk-size-for-a-rag-system-using-llamaindex-6207e5d3fec5)
+
+Vektör veritabanı olarak ChromaDB `PersistentClient` kullanılmıştır;
+veriler Docker volume ile kalıcıdır. `reset_collection`, yeni belge
+yüklendiğinde önceki chunk'ları silerek belge karışmasını önlemektedir.
+
+`query` fonksiyonu chunk'larla birlikte benzerlik mesafesini de
+döndürmektedir. Bu mesafe qa katmanında similarity threshold için
+kullanılacak, yeterince eşleşmeyen sorular LLM'e gönderilmeden
+reddedilecektir.
+
+---
+
+## 06 Haziran 2026
+
+### Context Window (num_ctx)
+
+`num_ctx` 4096 olarak ayarlanmıştır. Varsayılan 2048, system prompt +
+üç chunk + soru toplamını zorlayıp bağlamı kırpabileceği anlaşılmıştır.
+
+### Retrieval + Generation Katmanı (qa)
+
+Başta belirlenmiş olan iki aşamalı hallucination kontrolü için retrieval tarafında
+soru-belge benzerliği `DISTANCE_THRESHOLD` ile kontrol edilmiştir.
+Generation tarafında ise system prompt'a kurallar eklenmiştir ve `temperature` değeri düşük tutulmuştur.
+`DISTANCE_THRESHOLD` ve `temperature` için nihai değerler test aşamasında belirlenecektir.
+
+### Model Yükleme (entrypoint)
+
+Ollama servisi ayağa kalktığında model otomatik inmediği için bir
+`entrypoint.sh` scripti eklenmiştir. Script Ollama sunucusunu başlatmakta,
+hazır olmasını bekledikten sonra modeli çekmektedir.
