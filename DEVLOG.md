@@ -98,7 +98,7 @@ Ingestion → Extraction → Indexing → RAG → UI
 
 Modül yapısı:
 ```
-app/
+.
 ├── main.py          ← Streamlit UI
 ├── ingestion.py     ← dosya tespiti, yönlendirme
 ├── ocr.py           ← PyMuPDF + EasyOCR
@@ -194,7 +194,7 @@ gözlemlendiğinden bu artış recall'u iyileştirdi.
 
 Kalibrasyon sonrası gözlemlenen mesafeler: belgede bulunan sorular
 0.67-0.78, bulunmayan sorular 0.98 ve üstü. `DISTANCE_THRESHOLD` bu iki
-aralığı ayıracak şekilde 0.85 olarak belirlendi. Ayrıntılı ölçümler
+aralığı ayıracak şekilde 0.82 olarak belirlendi. Ayrıntılı ölçümler
 TESTING.md'de yer almaktadır.
 
 ## 07 Haziran 2026

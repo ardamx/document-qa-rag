@@ -76,7 +76,7 @@ model (örneğin `gemma3:4b-it-q4_K_M`) tercih edilebilir.
 ## Proje Yapısı
 
 ```
-app/
+.
 ├── main.py          Streamlit arayüzü
 ├── ingestion.py     Dosya doğrulama ve yönlendirme
 ├── ocr.py           PyMuPDF + EasyOCR metin çıkarımı
