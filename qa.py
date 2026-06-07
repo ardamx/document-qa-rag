@@ -11,8 +11,8 @@ OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://ollama:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3:12b-it-q4_K_M")
 
 # Retrieval ayarları
-N_RESULTS = 3            # kaç chunk getirilecek
-DISTANCE_THRESHOLD = 1.0  # bu mesafenin üstü "eşleşme yok" sayılır
+N_RESULTS = 5            # kaç chunk getirilecek
+DISTANCE_THRESHOLD = 0.82  # bu mesafenin üstü "eşleşme yok" sayılır
 
 # Belge dışı / eşleşmeyen sorular için sabit yanıt
 NO_MATCH_MESSAGE = "Bu bilgi belgelerde yer almıyor."
@@ -39,6 +39,8 @@ _client = ollama.Client(host=OLLAMA_HOST)
 
 
 def answer_question(question: str) -> str:
+
+    #print(f"[DEBUG] answer_question çağrıldı, soru: {question}", flush=True)  # <-- debug
     """
     Soruyu yanıtlar.
     1. İlgili chunk'ları retrieve eder
@@ -47,7 +49,11 @@ def answer_question(question: str) -> str:
     """
     documents, distances = query(question, n_results=N_RESULTS)
 
-    # Guardrail 1: hiç sonuç yoksa veya en yakın eşleşme bile uzaksa reddet
+    #print(f"[DEBUG] distances: {distances}", flush=True)  # <-- debug
+    #for i, doc in enumerate(documents):
+    #    print(f"[DEBUG] chunk {i}: {doc}", flush=True)
+
+    # Guardrail 1: hiç sonuç yoksa veya en yakın eşleşme uzaksa reddet
     if not documents or min(distances) > DISTANCE_THRESHOLD:
         return NO_MATCH_MESSAGE
 

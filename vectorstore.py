@@ -6,7 +6,10 @@ from embeddings import embed_texts, embed_query
 # Kalıcı (persistent) ChromaDB istemcisi
 # Veriler /app/data altına yazılır (Docker volume ile mount edilir)
 _client = chromadb.PersistentClient(path="/app/data")
-_collection = _client.get_or_create_collection(name="documents")
+_collection = _client.get_or_create_collection(
+    name="documents",
+    metadata={"hnsw:space": "cosine"}
+)
 
 
 def reset_collection() -> None:
@@ -16,7 +19,10 @@ def reset_collection() -> None:
     """
     global _collection
     _client.delete_collection(name="documents")
-    _collection = _client.get_or_create_collection(name="documents")
+    _collection = _client.get_or_create_collection(
+        name="documents",
+        metadata={"hnsw:space": "cosine"}
+    )
 
 
 def add_chunks(chunks: list[str]) -> None:

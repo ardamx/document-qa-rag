@@ -176,3 +176,33 @@ Generation tarafında ise system prompt'a kurallar eklenmiştir ve `temperature`
 Ollama servisi ayağa kalktığında model otomatik inmediği için bir
 `entrypoint.sh` scripti eklenmiştir. Script Ollama sunucusunu başlatmakta,
 hazır olmasını bekledikten sonra modeli çekmektedir.
+
+### Retrieval Kalibrasyonu (cosine geçişi)
+
+İlk testlerde ChromaDB'nin varsayılan squared L2 mesafesiyle alakalı ve
+alakasız soruların değer aralıkları (~9-10 ve ~14-15) birbirine fazla
+yakın çıktı, güvenilir bir eşik belirlenemedi.
+
+Bu nedenle vektör veritabanı kosinüs mesafesine (`hnsw:space: cosine`)
+geçirildi; değerler 0-2 aralığında normalize olduğu için alakalı/alakasız
+ayrımı belirginleşti.
+
+Ayrıca belge slayt formatında kısa maddelerden oluştuğu için chunk boyutu
+200 kelime / 40 örtüşme olarak düşürüldü ve `N_RESULTS` 3'ten 5'e
+çıkarıldı. Tekil geçişli terimlerin retrieval'da geride kaldığı
+gözlemlendiğinden bu artış recall'u iyileştirdi.
+
+Kalibrasyon sonrası gözlemlenen mesafeler: belgede bulunan sorular
+0.67-0.78, bulunmayan sorular 0.98 ve üstü. `DISTANCE_THRESHOLD` bu iki
+aralığı ayıracak şekilde 0.85 olarak belirlendi. Ayrıntılı ölçümler
+TESTING.md'de yer almaktadır.
+
+## 07 Haziran 2026
+
+### Hybrid PDF Stratejisi Doğrulaması
+
+Resim ve metin içeren gerçek bir akademik PDF ile hybrid extraction
+test edildi. Yalnızca bir figür görselinin içinde geçen bilgi ("Sam
+Altman ... CEO") başarıyla retrieve edildi ve doğru yanıtlandı. Bu,
+`_ocr_page_images` ile gömülü görsellerin OCR'dan geçirilmesi kararının
+gerçek bir senaryoda işe yaradığını doğruladı.

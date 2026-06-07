@@ -16,7 +16,7 @@ def get_model() -> SentenceTransformer:
     return _model
 
 
-def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> list[str]:
+def chunk_text(text: str, chunk_size: int = 200, overlap: int = 40) -> list[str]:
     """
     Metni kelime bazında örtüşmeli parçalara böler.
     chunk_size: her parçadaki kelime sayısı
